@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<?php
+	include "../php/head.php"
+	?>
+	<title>Apariencia</title>
+</head>
+<body>
+	<header>
+		<?php include '../php/navbar.php'; 
+		include '../php/boxSetting.php';
+		?>
+		<div class="boxAppearance">
+			<div class="appearanceGen">
+				<p>Apariencia general</p>
+				<button id="modoOscuroBtn">Tema oscuro</button>
+			</div>
+			<p>Seleccionar el tamaño</p>
+			<form>
+                <input type="radio" id="opcion1" name="opcion" value="opcion1">
+                <label for="opcion1">6</label><br>
+                <input type="radio" id="opcion2" name="opcion" value="opcion2">
+                <label for="opcion2">18</label><br>
+                <input type="radio" id="opcion3" name="opcion" value="opcion3">
+                <label for="opcion3">26</label><br>
+            </form>
+			<p>Seleccionar el tipo de fuente</p>
+			<form>
+                <input type="radio" id="opcion1" name="opcion" value="opcion1">
+                <label for="opcion1">Arial</label><br>
+                <input type="radio" id="opcion2" name="opcion" value="opcion2">
+                <label for="opcion2">Cabril</label><br>
+                <input type="radio" id="opcion3" name="opcion" value="opcion3">
+                <label for="opcion3">Georgia</label><br><br><br>
+            </form>
+			<button id="boton" class="save">Guardar</button>
+		</div>
+	</header>
+</body>
+</html>
