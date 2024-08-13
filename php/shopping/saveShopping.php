@@ -1,12 +1,5 @@
 <?php
-
-// Establecer conexión a la base de datos
-$conexion = new mysqli('localhost', 'root', '', 'sistema_facturacion');
-
-// Verificar si hay un error de conexión
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
-}
+require "../../conn.php";
 
 // Verificar si se envió el formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -33,26 +26,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $id_persona = $fila_persona["id_persona"];
             $fecha = date('Y-m-d');
 
+            // Ingresar la compra
             $sql_insertar = "INSERT INTO compras (id_productos, id_persona, cantidad, precio_compra, fecha) VALUES ('$id_producto', '$id_persona', '$cantidad', '$precio_compra', '$fecha')";
 
             if ($conexion->query($sql_insertar) === TRUE) {
-                $sql_precio_compra = "SELECT precio_compra FROM compras WHERE id_productos = '$id_producto' AND id_persona = '$id_persona' AND cantidad = '$cantidad' AND fecha = '$fecha'";
-                $resultado_precio_compra = $conexion->query($sql_precio_compra);
+                // Eliminar todos los datos existentes en la tabla de inventario
+                $sql_eliminar_inventario = "DELETE FROM inventario";
+                $conexion->query($sql_eliminar_inventario);
 
-                if ($resultado_precio_compra && $resultado_precio_compra->num_rows > 0) {
-                    $fila_precio_compra = $resultado_precio_compra->fetch_assoc();
-                    $precio_compra_nuevo = $fila_precio_compra["precio_compra"];
+                // Sumar las cantidades para las compras
+                $sql_actualizar_inventario = "INSERT INTO inventario (id_productos, cantidad) 
+                                              SELECT id_productos, SUM(cantidad) 
+                                              FROM compras 
+                                              WHERE id_productos = '$id_producto' 
+                                              GROUP BY id_productos";
+                $conexion->query($sql_actualizar_inventario);
 
-                    $nuevo_precio_compra = $precio_compra_nuevo;
-                    $nuevo_precio = $nuevo_precio_compra * 1.2;
+                // Actualizar el precio de compra y el precio de venta
+                $nuevo_precio = $precio_compra * 1.2;
+                $sql_actualizar_precio = "UPDATE producto 
+                                          SET precio_compra = '$precio_compra', precio = '$nuevo_precio' 
+                                          WHERE id_productos = '$id_producto'";
 
-                    $sql_actualizar_precio = "UPDATE producto SET precio_compra = $nuevo_precio_compra, precio = $nuevo_precio WHERE id_productos = $id_producto";
-
-                    if ($conexion->query($sql_actualizar_precio) !== TRUE) {
-                        echo "Error al actualizar el precio de compra en la tabla de productos: " . $conexion->error;
-                    }
-                } else {
-                    echo "Error al guardar la compra: " . $conexion->error;
+                if ($conexion->query($sql_actualizar_precio) !== TRUE) {
+                    echo "Error al actualizar el precio de compra en la tabla de productos: " . $conexion->error;
                 }
             } else {
                 echo "Error al insertar la compra: " . $conexion->error;
