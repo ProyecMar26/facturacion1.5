@@ -16,3 +16,6 @@ if (isset($_POST['buscar'])) {
     <button type="submit">Buscar</button>
     <button type="submit" name="clear_search">Eliminar Búsqueda</button>
 </form>
+<div class="boxPrint">
+    <a href="../php/people/printPeople.php"><button>Imprimir personas</button></a>
+</div>
