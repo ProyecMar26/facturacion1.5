@@ -1,0 +1,42 @@
+<?php
+session_start();
+include '../conn.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_SESSION['username'];
+    $nombre = $_POST['Nombre'];
+    $email = $_POST['Email'];
+    $password = $_POST['Contraseña'];
+
+    // Manejar la subida de la imagen
+    $imagePath = null;
+    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0) {
+        $imageName = $_FILES['imagen']['name'];
+        $imageTmpName = $_FILES['imagen']['tmp_name'];
+        $imagePath = '../../uploads/' . $imageName;
+        move_uploaded_file($imageTmpName, $imagePath);
+        $imagePath = $imageName;
+    }
+
+    // Actualizar la información del usuario en la base de datos
+    $sql = "UPDATE usuarios SET nombre = ?, email = ?, password = ?" . ($imagePath ? ", image = ?" : "") . " WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+
+    if (!$stmt) {
+        die("Error en la preparación de la consulta SQL: " . $conn->error);
+    }
+
+    if ($imagePath) {
+        $stmt->bind_param("sssss", $nombre, $email, $password, $imagePath, $username);
+    } else {
+        $stmt->bind_param("ssss", $nombre, $email,  $password, $username);
+    }
+
+    if ($stmt->execute()) {
+        $_SESSION['email'] = $email;
+        header("Location: ../../modules/profile.php");
+    } else {
+        echo "Error al actualizar el perfil.";
+    }
+}
+?>
