@@ -43,7 +43,7 @@ if ($result && $result->num_rows > 0) {
                     <td><input type='text' name='producto' value='{$row['producto']}'></td>
                     <td><input type='number' name='cantidad' value='{$row['cantidad']}'></td>
                     <td><input type='number' name='precio' value='{$row['precio']}'></td>
-                    <td><input type='number' name='total' value='{$row['total']}' readonly></td>
+                    <td>{$row['total']}</td>
                     <td><button type='submit'>Guardar</button></td>
                     <td><a href=\"../php/sales/deleteSales.php?id={$row['id_ventas']}\" onclick=\"return confirm('¿Estás seguro que deseas eliminar esta venta?')\">Eliminar</a></td>
                 </form>
