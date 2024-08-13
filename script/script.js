@@ -1,28 +1,21 @@
-function redireccionar() {
-  window.location.href = 'pagina_principal';
-}
-// fechaHora.js
-
-// Función para obtener la fecha y hora actual
 function obtenerFechaHora() {
     // Crear un objeto de fecha
     var fechaHora = new Date();
 
     // Obtener los componentes de la fecha y hora
     var dia = fechaHora.getDate();
-    var mes = fechaHora.getMonth() + 1; // Se suma 1 porque los meses van de 0 a 11
+    var mes = fechaHora.getMonth(); // Obtener el índice del mes
     var año = fechaHora.getFullYear();
     var horas = fechaHora.getHours();
     var minutos = fechaHora.getMinutes();
     var segundos = fechaHora.getSeconds();
 
+    // Nombres de los meses
+    var nombresMeses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    var nombreMes = nombresMeses[mes]; // Nombre del mes en formato corto
+    var mesNumero = (mes + 1).toString().padStart(2, '0'); // Número del mes con ceros a la izquierda
+
     // Formatear la salida (agregar ceros a la izquierda si es necesario)
-    if (mes < 10) {
-        mes = '0' + mes;
-    }
-    if (dia < 10) {
-        dia = '0' + dia;
-    }
     if (horas < 10) {
         horas = '0' + horas;
     }
@@ -33,22 +26,51 @@ function obtenerFechaHora() {
         segundos = '0' + segundos;
     }
 
-    // Construir la cadena de fecha y hora
-    var fechaHoraActual = dia + '/' + mes + '/' + año + ' ' + horas + ':' + minutos + ':' + segundos;
+    // Construir las cadenas de fecha y hora
+    var fechaHoraLarga = horas + ':' + minutos + ':' + segundos + ' ' + dia + ' ' + nombreMes + ' ' + año;
+    var fechaHoraCorta = horas + ':' + minutos + ':' + segundos + ' ' + dia + '/' + mesNumero + '/' + año;
 
-    // Devolver la cadena
-    return fechaHoraActual;
+    // Devolver las cadenas
+    return {
+        largo: fechaHoraLarga,
+        corto: fechaHoraCorta
+    };
 }
 
+// Función para actualizar el div con la fecha y hora actual
+function actualizarFechaHora() {
+    var fechaHoraDiv = document.getElementById('fecha-hora');
+    var formatos = obtenerFechaHora();
+    fechaHoraDiv.setAttribute('data-full', formatos.largo);
+    fechaHoraDiv.setAttribute('data-short', formatos.corto);
+}
+
+// Esperar a que el DOM esté completamente cargado antes de ejecutar el código
+document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar la fecha y hora inmediatamente al cargar la página
+    actualizarFechaHora();
+    // Actualizar la fecha y hora cada segundo
+    setInterval(actualizarFechaHora, 1000);
+});
 
 function toggleMenu() {
-  var listaMenu = document.getElementById("lista-menu");
-  if (listaMenu.style.display === "block") {
-    listaMenu.style.display = "none";
-  } else {
-    listaMenu.style.display = "block";
-  }
+    const menu = document.getElementById('lista-menu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
 }
 
+// También puedes agregar un evento para cerrar el menú si haces clic fuera de él
+window.addEventListener('click', function(event) {
+    if (!event.target.matches('.boton_menu')) {
+        const menu = document.getElementById('lista-menu');
+        if (menu.style.display === 'block') {
+            menu.style.display = 'none';
+        }
+    }
+});
+
+function toggleNavbar() {
+    const navbar = document.querySelector('.side-navbar');
+    navbar.classList.toggle('active');
+}
 
 
