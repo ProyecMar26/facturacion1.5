@@ -1,5 +1,4 @@
 <?php
-
 require "../../php/conn.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
