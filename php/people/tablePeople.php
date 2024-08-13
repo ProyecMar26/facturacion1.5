@@ -1,6 +1,7 @@
 <?php
 if ($resultado_personas && $resultado_personas->num_rows > 0) {
-    echo "<table border='1'>";
+    echo "<h2>Personas</h2>";
+    echo "<table>";
     echo "<tr>
         <th>ID persona</th>
         <th>Documento.</th>
