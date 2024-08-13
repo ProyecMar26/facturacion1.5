@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <?php include "../php/head.php"; ?>
+    <title>Apariencia</title>
+</head>
+<body>
+    <header>
+        <?php include '../php/navbar.php'; ?>
+        <?php include '../php/boxSetting.php'; ?>
+        <div class="boxAppearance setting box">
+            <div class="appearanceGen">
+                <p>Apariencia general</p>
+                <button id="modoOscuroBtn">Modo oscuro</button>
+            </div>
+            <p>Seleccionar el tamaño</p>
+            <ul id="sizeList" class="option-list">
+                <li data-size="8">8</li>
+                <li data-size="normal">14 (Normal)</li>
+                <li data-size="26">26</li>
+            </ul>
+            <p>Seleccionar el tema</p>
+            <ul id="themeList" class="option-list">
+                <li data-theme="light">Normal</li>
+                <li data-theme="dark">Oscuro</li>
+            </ul>
+            <button id="saveButton" class="save">Guardar</button>
+        </div>
+    </header>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar configuraciones desde localStorage
+            const savedFontSize = localStorage.getItem('fontSize');
+            const savedTheme = localStorage.getItem('theme');
+
+            if (savedFontSize) {
+                document.body.style.fontSize = savedFontSize;
+                document.querySelector(`#sizeList li[data-size="${savedFontSize.replace('px', '')}"]`).classList.add('selected');
+            } else {
+                document.querySelector('#sizeList li[data-size="normal"]').classList.add('selected');
+            }
+
+            if (savedTheme) {
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    document.querySelector(`#themeList li[data-theme="dark"]`).classList.add('selected');
+                } else {
+                    document.querySelector(`#themeList li[data-theme="light"]`).classList.add('selected');
+                }
+            }
+
+            // Manejar cambios en el tamaño de la fuente
+            document.getElementById('sizeList').addEventListener('click', function(event) {
+                if (event.target.tagName === 'LI') {
+                    const selectedSize = event.target.getAttribute('data-size');
+                    document.querySelectorAll('#sizeList li').forEach(li => li.classList.remove('selected'));
+                    event.target.classList.add('selected');
+
+                    if (selectedSize === '8') {
+                        document.body.style.fontSize = '8px';
+                        localStorage.setItem('fontSize', '8px');
+                    } else if (selectedSize === '26') {
+                        document.body.style.fontSize = '26px';
+                        localStorage.setItem('fontSize', '26px');
+                    } else {
+                        document.body.style.fontSize = '';
+                        localStorage.removeItem('fontSize');
+                    }
+                }
+            });
+
+            // Manejar cambios en el tema
+            document.getElementById('themeList').addEventListener('click', function(event) {
+                if (event.target.tagName === 'LI') {
+                    const selectedTheme = event.target.getAttribute('data-theme');
+                    document.querySelectorAll('#themeList li').forEach(li => li.classList.remove('selected'));
+                    event.target.classList.add('selected');
+
+                    if (selectedTheme === 'dark') {
+                        document.body.classList.add('dark-mode');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                        localStorage.setItem('theme', 'light');
+                    }
+                }
+            });
+
+            // Guardar configuraciones al hacer clic en "Guardar"
+            document.getElementById('saveButton').addEventListener('click', function() {
+                alert('Configuración guardada');
+            });
+        });
+    </script>
+</body>
+</html>
