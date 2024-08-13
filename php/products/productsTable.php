@@ -1,7 +1,7 @@
 <?php
 include '../php/conn.php'; // Asegúrate de que la ruta sea correcta
 
-$limit = 8; // Número de registros por página
+$limit = 6; // Número de registros por página
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page - 1) * $limit;
 
@@ -13,14 +13,14 @@ if (!$result) {
 $total = $result->fetch_assoc()['total'];
 $pages = ceil($total / $limit);
 
-// Consulta para obtener los productos con paginación
-$products = $conn->query("SELECT * FROM producto LIMIT $start, $limit");
+// Consulta para obtener los productos con paginación y ordenados alfabéticamente por nombre
+$products = $conn->query("SELECT * FROM producto ORDER BY nombre ASC LIMIT $start, $limit");
 if (!$products) {
     die("Error en la consulta: " . $conn->error);
 }
 
 if ($products && $products->num_rows > 0) {
-    echo "<table border='1'>";
+    echo "<table>";
     echo "<tr>
         <th>ID Producto</th>
         <th>ID Categoría</th>
@@ -39,22 +39,26 @@ if ($products && $products->num_rows > 0) {
                 <td><input type='number' name='precio_compra' value='{$fila['precio_compra']}'></td>
                 <td><input type='number' name='precio' value='{$fila['precio']}'></td>
                 <td><button type='submit'>Guardar</button></td>
-                <td><a href=\"?id={$fila['id_productos']}\" onclick=\"return confirm('¿Estás seguro que deseas eliminar este producto?')\">Eliminar</a></td>
+                <td><a href=\"../php/products/deleteProducts.php?id={$fila['id_productos']}\" onclick=\"return confirm('¿Estás seguro que deseas eliminar este producto?')\">Eliminar</a></td>
             </form>
         </tr>";
     }
     echo "</table>";
 
-   echo '<div class="pagination">';
-if ($page > 1) {
-    echo '<a href="?page=' . ($page - 1) . '" class="pagination-nav">Anterior</a>';
+    echo '<div class="pagination">';
+    if ($page > 1) {
+        echo '<a href="?page=' . ($page - 1) . '" class="pagination-nav">Anterior</a>';
+    }
+    for ($i = 1; $i <= $pages; $i++) {
+        echo '<a href="?page=' . $i . '" class="pagination-number">' . $i . '</a>';
+    }
+    if ($page < $pages) {
+        echo '<a href="?page=' . ($page + 1) . '" class="pagination-nav">Siguiente</a>';
+    }
+    echo '</div>';
+} else {
+    echo '<p>No hay productos disponibles.</p>';
 }
-for ($i = 1; $i <= $pages; $i++) {
-    echo '<a href="?page=' . $i . '" class="pagination-number">' . $i . '</a>';
-}
-if ($page < $pages) {
-    echo '<a href="?page=' . ($page + 1) . '" class="pagination-nav">Siguiente</a>';
-}
-echo '</div>';
-}
+
+$conn->close();
 ?>
