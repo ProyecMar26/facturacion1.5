@@ -1,5 +1,5 @@
 <?php
-require '../php/conn.php'; // Asegúrate de que esta es la ruta correcta
+require __DIR__ . '/../../php/conn.php'; // Conexión a la base de datos 
 
 // Inicializar la variable $resultado_personas
 $resultado_personas = null;
@@ -13,37 +13,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $empresa = $_POST['empresa'];
     $documento = $_POST['documento'];
 
-    // Verificar si el documento ya existe
-    $sql_verificar_nombre = "SELECT * FROM persona WHERE documento = ?";
-    $stmt_verificar = $conn->prepare($sql_verificar_nombre);
-    $stmt_verificar->bind_param('s', $documento);
-    $stmt_verificar->execute();
-    $resultado_verificacion = $stmt_verificar->get_result();
+    $sql_verificar_nombre = "SELECT * FROM persona WHERE documento = '$documento'";
+    $resultado_verificacion = $conn->query($sql_verificar_nombre);
 
-    if ($resultado_verificacion->num_rows > 0) {
-        // Redirigir a la página de people con un mensaje de error
-        header("Location: ../../modules/people.php?error=exists");
-        exit();
+    if ($resultado_verificacion && $resultado_verificacion->num_rows > 0) {
+        // Si el producto ya existe, mostrar un mensaje de error
+        echo "<script>alert('Error: el producto \"$documento\" ya existe en la base de datos.');</script>";
     } else {
-        // Crear la consulta SQL para insertar la nueva persona
-        $sql_insertar = "INSERT INTO persona (documento, nombre, direccion, telefono, empresa) VALUES (?, ?, ?, ?, ?)";
-        $stmt_insertar = $conn->prepare($sql_insertar);
-        $stmt_insertar->bind_param('dssds', $documento, $nombre, $direccion, $telefono, $empresa);
+        // Crear la consulta SQL para insertar la persona en la base de datos
+        $sql_insertar = "INSERT INTO persona (documento, nombre, direccion, telefono, empresa) VALUES ('$documento', '$nombre', '$direccion', '$telefono', '$empresa')";
 
-        if ($stmt_insertar->execute()) {
-            // Redirigir a la página de people con un mensaje de éxito
-            header("Location: ../../modules/people.php?success=added");
-            exit();
+        // Ejecutar la consulta SQL para insertar la persona
+        if ($conn->query($sql_insertar) === TRUE) {
+            // Redirigir a people.php después de la inserción
+            header("Location: ../../modules/people.php");
+            exit(); // Asegurarse de que el script se detenga después de la redirección
         } else {
-            // Redirigir a la página de people con un mensaje de error en la inserción
-            header("Location: ../../modules/people.php?error=insert");
-            exit();
+            echo "Error al guardar la persona: " . $conn->error;
         }
-    }
-
-    // Cerrar las declaraciones
-    $stmt_verificar->close();
-    $stmt_insertar->close();
+    }   
 }
-
 ?>
